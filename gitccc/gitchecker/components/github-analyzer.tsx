@@ -27,8 +27,8 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Search, Star, GitFork, Eye, Activity, Bug, GitPullRequest, Clock, Users, FileCode, CheckCircle2, AlertCircle, Github, GitBranch, GitCommit, FileText, Code2, BookOpen, Copy, AlertTriangle, GitMerge } from 'lucide-react'
-
-
+import { AboutSectionCard } from '@/components/ui/aboutSectionCard'
+import { extractRepoPath, formatApiResponse, formatChartData } from './helpers'
 
 export default function GithubAnalyzer() {
   const [showDashboard, setShowDashboard] = useState(false)
@@ -36,98 +36,6 @@ export default function GithubAnalyzer() {
   const [repoUrl, setRepoUrl] = useState('')
   const [error, setError] = useState(null)
   const [formattedData, setFormattedData] = useState(null)
-
-
-  const extractRepoPath = (url) => {
-    const cleanUrl = url.trim().replace(/\/+$/, '')
-    const githubPattern = /github\.com[\/:]([^\/]+)\/([^\/\.]+)/
-    const githubMatch = cleanUrl.match(githubPattern)
-    
-    if (githubMatch) {
-      return `${githubMatch[1]}/${githubMatch[2]}`
-    }
-    
-    const simplePattern = /^([^\/\s]+)\/([^\/\s]+)$/
-    const simpleMatch = cleanUrl.match(simplePattern)
-    
-    if (simpleMatch) {
-      return cleanUrl
-    }
-    
-    return null
-  }
-
-  const formatApiResponse = (apiData) => {
-    // The API sends data in apiData.analysis
-    const data = apiData.analysis;  // Extract the analysis part from response
-    
-    // Now structure the API response to match the expected format
-    return {
-      repositoryAnalytics: {
-        commitFrequency: {
-          hourlyFrequency: data?.repositoryAnalytics?.commitFrequency?.hourlyFrequency || Array(24).fill(0),
-          dailyFrequency: data?.repositoryAnalytics?.commitFrequency?.dailyFrequency || Array(7).fill(0),
-          peakHour: data?.repositoryAnalytics?.commitFrequency?.peakHour || 0,
-          peakDay: data?.repositoryAnalytics?.commitFrequency?.peakDay || 0,
-        },
-        forkStars: {
-          forks: data?.repositoryAnalytics?.forkStars?.forks || 0,
-          stars: data?.repositoryAnalytics?.forkStars?.stars || 0,
-          watchers: data?.repositoryAnalytics?.forkStars?.watchers || 0,
-        },
-      },
-      qualityMetrics: {
-        codeDuplication: {
-          totalDuplicates: data?.qualityMetrics?.codeDuplication?.totalDuplicates || 0,
-          duplicates: data?.qualityMetrics?.codeDuplication?.duplicates || [],
-        },
-        testCoverage: {
-          testFilesCount: data?.qualityMetrics?.testCoverage?.testFilesCount || 0,
-          sourceFilesCount: data?.qualityMetrics?.testCoverage?.sourceFilesCount || 0,
-          coverage: data?.qualityMetrics?.testCoverage?.coverage || "0.00",
-        },
-        docCoverage: {
-          docFilesCount: data?.qualityMetrics?.docCoverage?.docFilesCount || 0,
-          totalFiles: data?.qualityMetrics?.docCoverage?.totalFiles || 0,
-          coverage: data?.qualityMetrics?.docCoverage?.coverage || "0.00",
-        },
-        codeComplexity: {
-          averageComplexity: data?.qualityMetrics?.codeComplexity?.averageComplexity || 0,
-        },
-      },
-      teamPerformance: {
-        developerProductivity: data?.teamPerformance?.developerProductivity || [],
-        reviewEfficiency: {
-          totalPRs: data?.teamPerformance?.reviewEfficiency?.totalPRs || 0,
-          reviewedPRs: data?.teamPerformance?.reviewEfficiency?.reviewedPRs || 0,
-          reviewRate: data?.teamPerformance?.reviewEfficiency?.reviewRate || "0.00",
-        },
-        bugFixFrequency: {
-          totalBugs: data?.teamPerformance?.bugFixFrequency?.totalBugs || 0,
-          fixedBugs: data?.teamPerformance?.bugFixFrequency?.fixedBugs || 0,
-          fixRate: data?.teamPerformance?.bugFixFrequency?.fixRate || "0.00",
-        },
-      },
-      issueManagement: {
-        openIssues: data?.issueManagement?.openIssues || 0,
-        closedIssues: data?.issueManagement?.closedIssues || 0,
-        averageTimeToClose: data?.issueManagement?.averageTimeToClose || "0",
-      },
-      pullRequestAnalysis: {
-        openPRs: data?.pullRequestAnalysis?.openPRs || 0,
-        mergedPRs: data?.pullRequestAnalysis?.mergedPRs || 0,
-        averageTimeToMerge: data?.pullRequestAnalysis?.averageTimeToMerge || "0",
-      },
-      releaseManagement: {
-        totalReleases: data?.releaseManagement?.totalReleases || 0,
-        latestRelease: data?.releaseManagement?.latestRelease || "none",
-      },
-      cicd: {
-        cicdConfigured: data?.cicdCheck?.cicdConfigured || false,
-        workflows: data?.cicdCheck?.workflows || [],
-      },
-    }
-  }
 
   const handleAnalyze = async () => {
     console.log('Analyze button clicked')
@@ -168,7 +76,7 @@ export default function GithubAnalyzer() {
     } finally {
       setIsLoading(false)
     }
-}
+  }
 
 
   // Vibrant colors for dark theme
@@ -182,52 +90,7 @@ export default function GithubAnalyzer() {
     orange: '#FB923C',
   }
 
-
-  const formatChartData = () => {
-    if (!formattedData) return {
-      hourlyCommitData: [],
-      dailyCommitData: [],
-      developerData: [],
-      issueData: [],
-      prData: []
-    }
-
-    const hourlyCommitData = formattedData.repositoryAnalytics.commitFrequency.hourlyFrequency.map((value, hour) => ({
-      hour: `${hour.toString().padStart(2, '0')}:00`,
-      commits: value,
-    }))
-
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    const dailyCommitData = formattedData.repositoryAnalytics.commitFrequency.dailyFrequency.map((value, index) => ({
-      day: days[index],
-      commits: value,
-    }))
-
-    const developerData = formattedData.teamPerformance.developerProductivity
-      .sort((a, b) => b.contributions - a.contributions)
-      .slice(0, 5)
-
-    const issueData = [
-      { name: 'Open Issues', value: formattedData.issueManagement.openIssues },
-      { name: 'Closed Issues', value: formattedData.issueManagement.closedIssues },
-    ]
-
-    const prData = [
-      { name: 'Open PRs', value: formattedData.pullRequestAnalysis.openPRs },
-      { name: 'Merged PRs', value: formattedData.pullRequestAnalysis.mergedPRs },
-    ]
-
-    return {
-      hourlyCommitData,
-      dailyCommitData,
-      developerData,
-      issueData,
-      prData
-    }
-  }
-
-  const chartData = formatChartData()
-
+  const chartData = formatChartData(formattedData)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
@@ -298,65 +161,19 @@ export default function GithubAnalyzer() {
     <div className="space-y-8 animate-fade-in">
       {/* Repository Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardContent className="flex items-center p-6">
-            <Star className="h-8 w-8 text-yellow-400 mr-4" />
-            <div>
-              <p className="text-sm text-gray-400 ">Stars</p>
-              <h3 className="text-2xl font-bold text-white font-bold">{formattedData.repositoryAnalytics.forkStars.stars.toLocaleString()}</h3>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardContent className="flex items-center p-6">
-            <GitFork className="h-8 w-8 text-blue-400 mr-4" />
-            <div>
-              <p className="text-sm text-gray-400">Forks</p>
-              <h3 className="text-2xl font-bold text-white font-bold">{formattedData.repositoryAnalytics.forkStars.forks.toLocaleString()}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <AboutSectionCard data = {{formattedData}} id = "Stars" />
 
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardContent className="flex items-center p-6">
-            <Eye className="h-8 w-8 text-green-400 mr-4" />
-            <div>
-              <p className="text-sm text-gray-400">Watchers</p>
-              <h3 className="text-2xl font-bold text-white font-bold">{formattedData.repositoryAnalytics.forkStars.watchers.toLocaleString()}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <AboutSectionCard data = {{formattedData}} id = "Forks" />
 
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardContent className="flex items-center p-6">
-            <GitPullRequest className="h-8 w-8 text-purple-400 mr-4" />
-            <div>
-              <p className="text-sm text-gray-400">Open PRs</p>
-              <h3 className="text-2xl font-bold text-white font-bold">{formattedData.pullRequestAnalysis.openPRs}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <AboutSectionCard data = {{formattedData}} id = "Watchers" />
 
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardContent className="flex items-center p-6">
-            <AlertCircle className="h-8 w-8 text-red-400 mr-4" />
-            <div>
-              <p className="text-sm text-gray-400">Open Issues</p>
-              <h3 className="text-2xl font-bold text-white font-bold">{formattedData.issueManagement.openIssues}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <AboutSectionCard data = {{formattedData}} id = "Open PRs" />
 
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardContent className="flex items-center p-6">
-            <GitBranch className="h-8 w-8 text-pink-400 mr-4" />
-            <div>
-              <p className="text-sm text-gray-400">Latest Release</p>
-              <h3 className="text-xl font-bold text-white font-bold">{formattedData.releaseManagement.latestRelease}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <AboutSectionCard data = {{formattedData}} id = "Open Issues" />
+
+        <AboutSectionCard data = {{formattedData}} id = "Latest Release" />
+
       </div>
 
       {/* Commit Activity */}
