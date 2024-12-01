@@ -21,13 +21,13 @@ repositoryAnalyticsService = async (api, owner, repo) => {
         const forkStars = {
             forks: repoData.data.forks_count,
             stars: repoData.data.stargazers_count,
-            watchers: repoData.data.subscribers_count  // Changed from watchers_count to subscribers_count
+            watchers: repoData.data.subscribers_count
         };
 
         return {
             commitFrequency,
             codeChurn,
-            envLeaks: envLeaks ? '⚠️ .env file detected (potential security risk)' : '✅ No .env file detected',
+            envLeaks: envLeaks ? '⚠️ .env file detected (potential security risk)' : '✅ No .env file detected.',
             license: license?.data?.license?.name || 'No license detected',
             forkStars,
             securityAlerts
