@@ -12,7 +12,7 @@ function TeamPerformanceCard(props) {
     return (
         <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center text-white gap-2">
               {title == "Top Contributors" && <><Users className="h-5 w-5 text-purple-400" /> {title}</>}
               {title == "Pull Request Overview" && <><GitMerge className="h-5 w-5 text-pink-400" /> {title}</>}
             </CardTitle>

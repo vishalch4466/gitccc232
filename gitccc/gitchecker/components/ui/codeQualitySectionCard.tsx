@@ -19,7 +19,7 @@ function CodeQualitySectionCard(props) {
     return (
         <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center text-white gap-2">
               {title == "Test Coverage" && <><Code2 className="h-5 w-5 text-blue-400" /> {title}</>}
               {title == "Documentation Coverage" && <><BookOpen className="h-5 w-5 text-green-400" /> {title}</>}
               {title == "Code Duplication" && <><Copy className="h-5 w-5 text-orange-400" /> {title}</>}

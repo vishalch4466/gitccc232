@@ -39,7 +39,7 @@ function CommitActivityCard(props) {
     return (
         <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
           <CardHeader>
-            <CardTitle >
+            <CardTitle className="text-white">
               {cardTitle}
             </CardTitle>
               <CardDescription className="text-gray-400">
