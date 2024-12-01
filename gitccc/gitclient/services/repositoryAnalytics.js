@@ -21,7 +21,7 @@ repositoryAnalyticsService = async (api, owner, repo) => {
         const forkStars = {
             forks: repoData.data.forks_count,
             stars: repoData.data.stargazers_count,
-            watchers: repoData.data.watchers_count
+            watchers: repoData.data.subscribers_count  // Changed from watchers_count to subscribers_count
         };
 
         return {

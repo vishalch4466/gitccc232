@@ -10,6 +10,12 @@ import { extractRepoPath, formatApiResponse, formatChartData } from './helpers'
 import { CodeQualitySectionCard } from './ui/codeQualitySectionCard'
 import { TeamPerformanceCard } from './ui/teamPerformanceCard'
 import { IssueManagementCard } from './ui/issueManagementCard'
+import { 
+  SecurityOverviewCard, 
+  CodeChurnCard, 
+  DevelopmentMetricsCard, 
+  TeamMetricsCard 
+} from '@/components/ui/analyticsCards'
 
 export default function GithubAnalyzer() {
   const [showDashboard, setShowDashboard] = useState(false)
@@ -168,6 +174,12 @@ export default function GithubAnalyzer() {
         <TeamPerformanceCard title="Top Contributors" formattedData={formattedData} chartData={chartData} colors={COLORS} />
         <TeamPerformanceCard title="Pull Request Overview" formattedData={formattedData} chartData={chartData} colors={COLORS} />
       </div>
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <SecurityOverviewCard formattedData={formattedData} />
+        <CodeChurnCard formattedData={formattedData} />
+        <DevelopmentMetricsCard formattedData={formattedData} />
+        <TeamMetricsCard formattedData={formattedData} />
+      </div> */}
 
       {/* Issue Management */}
       <IssueManagementCard formattedData={formattedData} chartData={chartData} colors={COLORS} />
