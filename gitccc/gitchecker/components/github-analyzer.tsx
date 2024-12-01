@@ -1,34 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Search, Star, GitFork, Eye, Activity, Bug, GitPullRequest, Clock, Users, FileCode, CheckCircle2, AlertCircle, Github, GitBranch, GitCommit, FileText, Code2, BookOpen, Copy, AlertTriangle, GitMerge } from 'lucide-react'
-import { AboutSectionCard } from '@/components/ui/aboutSectionCard'
+import { Search, Github, Activity} from 'lucide-react'
+import { RepositoryOverviewCard } from '@/components/ui/repositoryOverviewCard'
+import { CommitActivityCard } from '@/components/ui/commitActivityCard';
 import { extractRepoPath, formatApiResponse, formatChartData } from './helpers'
+import { CodeQualitySectionCard } from './ui/codeQualitySectionCard'
+import { TeamPerformanceCard } from './ui/teamPerformanceCard'
+import { IssueManagementCard } from './ui/issueManagementCard'
 
 export default function GithubAnalyzer() {
   const [showDashboard, setShowDashboard] = useState(false)
@@ -46,7 +27,7 @@ export default function GithubAnalyzer() {
     console.log('Extracted repo path:', repoPath)
 
     if (!repoPath) {
-      setError('Please enter a valid GitHub repository path')
+      setError("Please enter a valid GitHub repository path")
       setIsLoading(false)
       return
     }
@@ -77,7 +58,6 @@ export default function GithubAnalyzer() {
       setIsLoading(false)
     }
   }
-
 
   // Vibrant colors for dark theme
   const COLORS = {
@@ -161,298 +141,36 @@ export default function GithubAnalyzer() {
     <div className="space-y-8 animate-fade-in">
       {/* Repository Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-
-        <AboutSectionCard data = {{formattedData}} id = "Stars" />
-
-        <AboutSectionCard data = {{formattedData}} id = "Forks" />
-
-        <AboutSectionCard data = {{formattedData}} id = "Watchers" />
-
-        <AboutSectionCard data = {{formattedData}} id = "Open PRs" />
-
-        <AboutSectionCard data = {{formattedData}} id = "Open Issues" />
-
-        <AboutSectionCard data = {{formattedData}} id = "Latest Release" />
-
+        <RepositoryOverviewCard data = {{formattedData}} id = "Stars" />
+        <RepositoryOverviewCard data = {{formattedData}} id = "Forks" />
+        <RepositoryOverviewCard data = {{formattedData}} id = "Watchers" />
+        <RepositoryOverviewCard data = {{formattedData}} id = "Open PRs" />
+        <RepositoryOverviewCard data = {{formattedData}} id = "Open Issues" />
+        <RepositoryOverviewCard data = {{formattedData}} id = "Latest Release" />
       </div>
 
       {/* Commit Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle>Hourly Commit Frequency</CardTitle>
-            <CardDescription className="text-gray-400">
-              Peak hour: {formattedData.repositoryAnalytics.commitFrequency.peakHour}:00
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData.hourlyCommitData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="hour" stroke="#9CA3AF" />
-                <YAxis stroke="#9CA3AF" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#fff' }}
-                  cursor={{ fill: 'rgba(96, 165, 250, 0.1)' }}
-                />
-                <Bar dataKey="commits" fill={COLORS.blue} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle>Daily Commit Activity</CardTitle>
-            <CardDescription className="text-gray-400">
-              Peak day: {days[formattedData.repositoryAnalytics.commitFrequency.peakDay]}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData.dailyCommitData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="day" stroke="#9CA3AF" />
-                <YAxis stroke="#9CA3AF" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#fff' }}
-                  cursor={{ fill: 'rgba(52, 211, 153, 0.1)' }}
-                />
-                <Bar dataKey="commits" fill={COLORS.green} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <CommitActivityCard formattedData={formattedData} title="Hourly Commit Frequency" description="Peak hour" chartData={chartData} colors={COLORS} dataKeyX="hour" barDataKey="commits" />
+        <CommitActivityCard formattedData={formattedData} title="Daily Commit Activity" description="Peak day" chartData={chartData} colors={COLORS} dataKeyX="day" barDataKey="commits" /> 
       </div>
 
       {/* Code Quality Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Code2 className="h-5 w-5 text-blue-400" />
-              Test Coverage
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center">
-              <div className="w-full mb-4">
-                <Progress value={parseFloat(formattedData.qualityMetrics.testCoverage.coverage)} className="h-4" />
-              </div>
-              <p className="text-3xl font-bold text-blue-400">{formattedData.qualityMetrics.testCoverage.coverage}%</p>
-              <p className="text-sm text-gray-400 mt-2">
-                {formattedData.qualityMetrics.testCoverage.testFilesCount} test files / {formattedData.qualityMetrics.testCoverage.sourceFilesCount} source files
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-green-400" />
-              Documentation Coverage
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center">
-              <div className="w-full mb-4">
-                <Progress value={parseFloat(formattedData.qualityMetrics.docCoverage.coverage)} className="h-4" />
-              </div>
-              <p className="text-3xl font-bold text-green-400">{formattedData.qualityMetrics.docCoverage.coverage}%</p>
-              <p className="text-sm text-gray-400 mt-2">
-                {formattedData.qualityMetrics.docCoverage.docFilesCount} doc files / {formattedData.qualityMetrics.docCoverage.totalFiles} total files
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Copy className="h-5 w-5 text-orange-400" />
-              Code Duplication
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center">
-              <p className="text-3xl font-bold text-orange-400">
-                {formattedData.qualityMetrics.codeDuplication.totalDuplicates}
-              </p>
-              <p className="text-sm text-gray-400 mt-2">Duplicate Files</p>
-              <ScrollArea className="h-24 w-full mt-4">
-                <div className="space-y-2">
-                  {formattedData.qualityMetrics.codeDuplication.duplicates.map((file, index) => (
-                    <div key={index} className="text-sm text-gray-300 bg-gray-700/50 px-2 py-1 rounded">
-                      {file}
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-400" />
-              Code Complexity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center">
-              <p className="text-3xl font-bold text-red-400">
-                {formattedData.qualityMetrics.codeComplexity.averageComplexity.toFixed(2)}
-              </p>
-              <p className="text-sm text-gray-400 mt-2">Average Complexity Score</p>
-              <div className="mt-4 w-full">
-                <div className="text-xs text-gray-400 mb-1">Complexity Scale</div>
-                <div className="grid grid-cols-5 gap-1">
-                  <div className="h-1 bg-green-400 rounded"></div>
-                  <div className="h-1 bg-yellow-400 rounded"></div>
-                  <div className="h-1 bg-orange-400 rounded"></div>
-                  <div className="h-1 bg-red-400 rounded"></div>
-                  <div className="h-1 bg-pink-400 rounded"></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>Simple</span>
-                  <span>Complex</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CodeQualitySectionCard formattedData={formattedData} title="Test Coverage" /> 
+        <CodeQualitySectionCard formattedData={formattedData} title="Documentation Coverage" /> 
+        <CodeQualitySectionCard formattedData={formattedData} title="Code Duplication" /> 
+        <CodeQualitySectionCard formattedData={formattedData} title="Code Complexity" /> 
       </div>
 
       {/* Team Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-purple-400" />
-              Top Contributors
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                layout="vertical"
-                data={chartData.developerData}
-                margin={{ top: 0, right: 0, bottom: 0, left: 40 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis type="number" stroke="#9CA3AF" />
-                <YAxis dataKey="username" type="category" stroke="#9CA3AF" width={100} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#fff' }}
-                  cursor={{ fill: 'rgba(167, 139, 250, 0.1)' }}
-                />
-                <Bar dataKey="contributions" fill={COLORS.purple}>
-                  {chartData.developerData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[Object.keys(COLORS)[index % Object.keys(COLORS).length]]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GitMerge className="h-5 w-5 text-pink-400" />
-              Pull Request Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-400">Average Time to Merge</p>
-                <p className="text-2xl font-bold text-pink-400">{formattedData.pullRequestAnalysis.averageTimeToMerge} days</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-400">PR Success Rate</p>
-                <p className="text-2xl font-bold text-green-400">
-                  {((formattedData.pullRequestAnalysis.mergedPRs / (formattedData.pullRequestAnalysis.mergedPRs + formattedData.pullRequestAnalysis.openPRs)) * 100).toFixed(1)}%
-                </p>
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={chartData.prData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {chartData.prData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? COLORS.orange : COLORS.green} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#fff' }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <TeamPerformanceCard title="Top Contributors" formattedData={formattedData} chartData={chartData} colors={COLORS} />
+        <TeamPerformanceCard title="Pull Request Overview" formattedData={formattedData} chartData={chartData} colors={COLORS} />
       </div>
 
       {/* Issue Management */}
-      <Card className="bg-gray-800/50 backdrop-blur border-gray-700">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white font-bold">
-            <AlertCircle className="h-5 w-5 text-yellow-400" />
-            Issue Management Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="text-center">
-              <p className="text-sm text-gray-400">Average Time to Close</p>
-              <p className="text-2xl font-bold text-yellow-400">{formattedData.issueManagement.averageTimeToClose} days</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-400">Issue Resolution Rate</p>
-              <p className="text-2xl font-bold text-green-400">
-                {((formattedData.issueManagement.closedIssues / (formattedData.issueManagement.openIssues + formattedData.issueManagement.closedIssues)) * 100).toFixed(1)}%
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-400">Total Issues</p>
-              <p className="text-2xl font-bold text-blue-400">
-                {formattedData.issueManagement.openIssues + formattedData.issueManagement.closedIssues}
-              </p>
-            </div>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie
-                data={chartData.issueData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {chartData.issueData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={index === 0 ? COLORS.red : COLORS.green} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ backgroundColor: '#1F2937', border: 'none', color: '#fff' }}
-              />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <IssueManagementCard formattedData={formattedData} chartData={chartData} colors={COLORS} />
     </div>
   );
 })()}
