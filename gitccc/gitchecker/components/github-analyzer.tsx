@@ -84,9 +84,9 @@ export default function GithubAnalyzer() {
         {/* Title and Search Section */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <Github className="w-12 h-12 text-blue-400 mr-4" />
+            {/* <Github className="w-12 h-12 text-blue-400 mr-4" /> */}
             <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-violet-400">
-              Github Repo Analyzer
+              Git Repo Analyzer
             </h1>
           </div>
           <div className="max-w-2xl mx-auto space-y-4">
